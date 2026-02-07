@@ -1,0 +1,127 @@
+<div class="help-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>help_outline</mat-icon>
+    Tech Stack Filter - Advanced Query Syntax
+  </h2>
+
+  <mat-dialog-content>
+    <mat-tab-group>
+      <!-- Basic Usage Tab -->
+      <mat-tab label="Basic Usage">
+        <div class="tab-content">
+          <h3>Simple Searches</h3>
+          <p>Just type any technology name to search for it. Searches are case-insensitive and support partial matching.</p>
+          
+          <div class="examples">
+            <div class="example-item" *ngFor="let example of basicExamples">
+              <div class="example-query">
+                <code>{{ example.query }}</code>
+                <button mat-icon-button (click)="copyToClipboard(example.query)" matTooltip="Copy to clipboard">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+              <div class="example-description">{{ example.description }}</div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <mat-icon>info</mat-icon>
+            <div>
+              <strong>Tip:</strong> Use quotes for multi-word terms like "Machine Learning" or "React Native"
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Operators Tab -->
+      <mat-tab label="Operators">
+        <div class="tab-content">
+          <h3>Boolean Operators</h3>
+          <p>Combine multiple conditions to create powerful queries.</p>
+
+          <div class="examples">
+            <div class="example-item" *ngFor="let example of operatorExamples">
+              <div class="operator-badge">{{ example.operator }}</div>
+              <div class="example-query">
+                <code>{{ example.query }}</code>
+                <button mat-icon-button (click)="copyToClipboard(example.query)" matTooltip="Copy to clipboard">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+              <div class="example-description">{{ example.description }}</div>
+            </div>
+          </div>
+
+          <h3>Operator Precedence</h3>
+          <p>Operators are evaluated in this order (highest to lowest priority):</p>
+          <table class="precedence-table">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Operator</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rule of precedenceRules">
+                <td>{{ rule.priority }}</td>
+                <td><strong>{{ rule.operator }}</strong></td>
+                <td><code>{{ rule.example }}</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-tab>
+
+      <!-- Examples Tab -->
+      <mat-tab label="Examples">
+        <div class="tab-content">
+          <h3>Real-World Query Examples</h3>
+          <p>Common use cases for finding your ideal job.</p>
+
+          <div class="examples">
+            <div class="complex-example" *ngFor="let example of complexExamples">
+              <h4>{{ example.title }}</h4>
+              <div class="example-query">
+                <code>{{ example.query }}</code>
+                <button mat-icon-button (click)="copyToClipboard(example.query)" matTooltip="Copy to clipboard">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+              <div class="example-description">{{ example.description }}</div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tips Tab -->
+      <mat-tab label="Tips">
+        <div class="tab-content">
+          <h3>Tips & Best Practices</h3>
+          <ul class="tips-list">
+            <li *ngFor="let tip of tips">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ tip }}</span>
+            </li>
+          </ul>
+
+          <div class="info-box warning">
+            <mat-icon>warning</mat-icon>
+            <div>
+              <strong>Common Mistakes:</strong>
+              <ul>
+                <li>Forgetting quotes: <code>Machine Learning</code> → <code>"Machine Learning"</code></li>
+                <li>Missing parentheses: <code>A OR B AND C</code> → <code>(A OR B) AND C</code></li>
+                <li>Operator at end: <code>Python AND</code> ❌</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-raised-button mat-dialog-close color="primary">Got it!</button>
+  </mat-dialog-actions>
+</div>

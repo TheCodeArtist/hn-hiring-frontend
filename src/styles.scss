@@ -1,0 +1,242 @@
+
+// Include theming for Angular Material with `mat.theme()`.
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+/* Theme CSS Custom Properties */
+:root {
+  /* Light Theme */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --bg-hover: #f1f3f5;
+  
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-tertiary: #6c757d;
+  --text-disabled: #adb5bd;
+  
+  --color-primary: #1565c0;
+  --color-primary-light: #e3f2fd;
+  --color-primary-dark: #0d47a1;
+  --color-primary-contrast: #ffffff;
+  
+  --color-success: #2e7d32;
+  --color-success-light: #e8f5e9;
+  --color-warning: #d84315;
+  --color-warning-light: #fff3e0;
+  --color-error: #c2185b;
+  --color-error-light: #fce4ec;
+  --color-info: #0277bd;
+  --color-info-light: #e1f5fe;
+  
+  --border-color: #dee2e6;
+  --divider-color: #e0e0e0;
+  
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  
+  --chip-primary-bg: #90caf9;
+  --chip-primary-text: #0d47a1;
+  --chip-secondary-bg: #bbdefb;
+  --chip-secondary-text: #0d47a1;
+  --chip-neutral-bg: #dee2e6;
+  --chip-neutral-text: #495057;
+  
+  /* Highlight colors for comparison view */
+  --highlight-common-bg: #e0f2f1;
+  --highlight-common-text: #00695c;
+  --highlight-common-border: #4db6ac;
+  --highlight-difference-bg: #fff9e6;
+  --highlight-difference-text: #e65100;
+  --highlight-difference-border: #ff9800;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3a3a3a;
+  --bg-hover: #404040;
+  
+  --text-primary: #f8f9fa;
+  --text-secondary: #dee2e6;
+  --text-tertiary: #adb5bd;
+  --text-disabled: #6c757d;
+  
+  --color-primary: #64b5f6;
+  --color-primary-light: #1e3a5f;
+  --color-primary-dark: #90caf9;
+  --color-primary-contrast: #000000;
+  
+  --color-success: #66bb6a;
+  --color-success-light: #1b3a1e;
+  --color-warning: #ffa726;
+  --color-warning-light: #4a2c1a;
+  --color-error: #f06292;
+  --color-error-light: #3d1e2e;
+  --color-info: #4fc3f7;
+  --color-info-light: #1a3d4f;
+  
+  --border-color: #495057;
+  --divider-color: #495057;
+  
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.24);
+  
+  --chip-primary-bg: #1976d2;
+  --chip-primary-text: #ffffff;
+  --chip-secondary-bg: #1e3a5f;
+  --chip-secondary-text: #90caf9;
+  --chip-neutral-bg: #495057;
+  --chip-neutral-text: #dee2e6;
+  
+  /* Highlight colors for comparison view - Dark theme */
+  --highlight-common-bg: #1a3d3a;
+  --highlight-common-text: #4db6ac;
+  --highlight-common-border: #26a69a;
+  --highlight-difference-bg: #3d2e1a;
+  --highlight-difference-text: #ffb74d;
+  --highlight-difference-border: #ff9800;
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme='dark'] body {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--color-primary-dark);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+  border-radius: 5px;
+
+  &:hover {
+    background: var(--text-secondary);
+  }
+}
+
+/* Material Dark Mode Overrides */
+[data-theme='dark'] {
+  .mat-mdc-table {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+  
+  .mat-mdc-header-row {
+    background-color: var(--bg-tertiary);
+  }
+  
+  .mat-mdc-row:hover {
+    background-color: var(--bg-hover) !important;
+  }
+  
+  .mat-mdc-card {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+  
+  .mat-mdc-dialog-container {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  
+  .mat-mdc-form-field .mat-mdc-input-element {
+    color: var(--text-primary);
+    caret-color: var(--color-primary);
+  }
+  
+  .mat-mdc-select {
+    color: var(--text-primary);
+  }
+  
+  .mat-mdc-option {
+    color: var(--text-primary);
+    
+    &:hover {
+      background-color: var(--bg-hover);
+    }
+  }
+  
+  .mat-mdc-chip.mat-mdc-standard-chip {
+    background-color: var(--chip-neutral-bg);
+    color: var(--chip-neutral-text);
+  }
+  
+  .mat-mdc-paginator {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  
+  .mat-mdc-icon-button {
+    color: var(--text-primary);
+  }
+  
+  .mat-mdc-progress-spinner circle {
+    stroke: var(--color-primary);
+  }
+  
+  .tech-stack-field.tech-stack-error input {
+    background-color: rgba(244, 67, 54, 0.15) !important;
+  }
+}
+
+/* Tech Stack Tooltip */
+.mat-mdc-tooltip.tech-stack-tooltip {
+  white-space: pre-line;
+  max-width: 400px !important;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 12px 16px;
+}
+
+/* Dialog Backdrop Blur */
+.cdk-overlay-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme='dark'] .cdk-overlay-backdrop {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}

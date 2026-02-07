@@ -1,0 +1,17 @@
+<div class="company-logo-wrapper" [class]="'size-' + size">
+  @if (!showInitials && logoUrl) {
+    <img 
+      [src]="logoUrl" 
+      [alt]="companyName + ' logo'"
+      class="company-logo-img"
+      (error)="onImageError()"
+      (load)="onImageLoad()"
+      loading="lazy"
+    />
+  }
+  @if (showInitials) {
+    <div class="company-logo-initials" [attr.title]="companyName">
+      {{ initials }}
+    </div>
+  }
+</div>

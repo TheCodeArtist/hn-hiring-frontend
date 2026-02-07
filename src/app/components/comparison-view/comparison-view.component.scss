@@ -1,0 +1,544 @@
+@use '../../styles/badges';
+
+.comparison-view {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+}
+
+.comparison-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    flex: 1;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .column-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-primary);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    margin-right: 0.75rem;
+
+    .counter-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+  }
+
+  .highlight-dropdown {
+    margin-left: 0.75rem;
+    width: 150px;
+    
+    // Match the counter box height and styling
+    ::ng-deep {
+      .mat-mdc-form-field-infix {
+        min-height: 32px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      
+      .mat-mdc-text-field-wrapper {
+        padding: 0;
+      }
+      
+      .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--border-color);
+        }
+      }
+      
+      .mat-mdc-form-field-focus-overlay {
+        background-color: transparent;
+      }
+      
+      .mat-mdc-select {
+        font-size: 0.875rem;
+        padding-left: 0;
+      }
+      
+      .mat-mdc-select-value {
+        color: var(--text-secondary);
+      }
+      
+      .mat-mdc-select-value-text {
+        padding-left: 0;
+      }
+      
+      .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+      
+      .mat-mdc-floating-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+    }
+  }
+
+  .remove-all {
+    margin-left: 0;
+  }
+}
+
+.comparison-placeholder {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.comparison-body {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-arrows {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+// Outer container for scroll area with indicators
+.comparison-scroll-container {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+
+  // Gradient overlays indicating more content
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  // Left gradient shadow
+  &::before {
+    left: 220px; // after label column
+    background: linear-gradient(to right, 
+      rgba(0, 0, 0, 0.1) 0%, 
+      rgba(0, 0, 0, 0.05) 40%,
+      transparent 100%);
+  }
+
+  // Right gradient shadow
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, 
+      rgba(0, 0, 0, 0.1) 0%, 
+      rgba(0, 0, 0, 0.05) 40%,
+      transparent 100%);
+  }
+
+  // Show gradients when scrollable
+  &.can-scroll-left::before {
+    opacity: 1;
+  }
+
+  &.can-scroll-right::after {
+    opacity: 1;
+  }
+}
+
+// Scroll indicator arrows (children of scroll-container, not scroll-wrapper)
+.scroll-indicator {
+  position: fixed;
+  top: 50vh;
+  transform: translateY(-50%);
+  z-index: 4;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, background-color 0.2s ease;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+
+  &.visible {
+    opacity: 0.9;
+    pointer-events: auto;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--bg-primary);
+    opacity: 1;
+    color: var(--text-primary);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0;
+  }
+
+  &.left {
+    left: 232px; // label column width + spacing
+  }
+
+  &.right {
+    right: 12px;
+  }
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// Inner scrollable wrapper
+.comparison-scroll-wrapper {
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.comparison-table-wrapper {
+  position: relative;
+  min-width: min-content;
+  padding-bottom: 1rem;
+}
+
+.comparison-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: auto;
+  min-width: 100%;
+
+  th, td {
+    border-bottom: 1px solid var(--divider-color);
+    vertical-align: middle;
+    padding: 8px 12px;
+  }
+
+  // First column (labels) - sticky
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--bg-secondary);
+    border-right: 2px solid var(--border-color);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.label-header-cell {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  height: 52px;
+  background: var(--bg-secondary);
+}
+
+.job-header-cell {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  height: 52px;
+  padding: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px 8px 0 0;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.job-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 8px 10px 12px;
+  background: var(--bg-secondary);
+  height: 100%;
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+
+  .drag-handle {
+    cursor: grab;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    margin: -4px 4px -4px -4px;
+    border-radius: 4px;
+
+    &:hover {
+      color: var(--text-secondary);
+      background: var(--bg-hover);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .company-header-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    margin-right: 8px;
+  }
+
+  .company-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-primary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0;
+
+    .close-col:hover {
+      color: var(--mat-sys-error, #b71c1c);
+    }
+  }
+}
+
+.section-header-row {
+  .section-label-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 12px 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+
+    .section-icon {
+      color: var(--color-primary);
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .section-spacer-cell {
+    padding: 6px 0;
+    background: var(--bg-primary);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+  }
+}
+
+.field-label-cell {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+}
+
+.field-value-cell {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+
+  .cell-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    word-break: break-word;
+    line-height: 1.5;
+    display: block;
+
+    &.common-value {
+      background: var(--highlight-common-bg);
+      color: var(--highlight-common-text);
+      font-weight: 500;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      border-radius: 4px;
+      display: inline;
+      border: 1px solid var(--highlight-common-border);
+    }
+
+    &.different-value {
+      background: var(--highlight-difference-bg);
+      color: var(--highlight-difference-text);
+      font-weight: 500;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      border-radius: 4px;
+      display: inline;
+      border: 1px solid var(--highlight-difference-border);
+    }
+
+    a {
+      color: var(--color-primary);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // When the link itself has the cell-value class (apply_links)
+  a.cell-value {
+    color: var(--color-primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &.common-value {
+      background: var(--highlight-common-bg);
+      color: var(--highlight-common-text);
+      font-weight: 500;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      border-radius: 4px;
+      border: 1px solid var(--highlight-common-border);
+    }
+
+    &.different-value {
+      background: var(--highlight-difference-bg);
+      color: var(--highlight-difference-text);
+      font-weight: 500;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      border-radius: 4px;
+      border: 1px solid var(--highlight-difference-border);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .comparison-scroll-wrapper {
+    overflow-x: hidden;
+  }
+
+  .comparison-scroll-container::before,
+  .comparison-scroll-container::after {
+    display: none;
+  }
+
+  .comparison-header {
+    flex-wrap: wrap;
+    
+    .spacer {
+      display: none;
+    }
+    
+    .column-counter {
+      display: none; // Hide on mobile to save space
+    }
+    
+    .highlight-dropdown {
+      width: 100%;
+      margin: 0.5rem 0 0 0;
+      
+      ::ng-deep {
+        .mat-mdc-form-field-infix {
+          min-height: 40px;
+        }
+      }
+    }
+    
+    .remove-all {
+      margin-left: auto;
+    }
+  }
+}
+
+// Add job placeholder styling
+.add-job-placeholder-cell {
+  background: var(--bg-secondary) !important;
+  border: 2px dashed var(--border-color) !important;
+  position: relative;
+
+  &.add-job-placeholder-spacer {
+    border-left: 2px dashed var(--border-color) !important;
+    border-right: 2px dashed var(--border-color) !important;
+  }
+}
+
+.add-job-placeholder-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 12px;
+
+  .add-job-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    white-space: nowrap;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}

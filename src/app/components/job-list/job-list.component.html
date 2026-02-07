@@ -1,0 +1,263 @@
+<div class="job-list-container">
+  <div class="header">
+    <div class="title-container">
+      <img src="hn-hiring-scanner.png" alt="HN Hiring Scanner Logo" class="logo">
+      <h1>HN Hiring Scanner</h1>
+    </div>
+    <p class="subtitle">Browse and filter job postings from Hacker News "Who's hiring?" threads to compare them side-by-side</p>
+    <button 
+      mat-icon-button 
+      class="compare-toggle"
+      (click)="openComparison()"
+      [matTooltip]="comparison.canCompare() ? 'Compare ' + comparison.count() + ' jobs' : 'Select at least 2 jobs to compare'"
+      [disabled]="!comparison.canCompare()"
+      [matBadge]="comparison.count()"
+      [matBadgeHidden]="comparison.count() === 0"
+      matBadgeColor="accent"
+      aria-label="Compare selected jobs">
+      <mat-icon>compare_arrows</mat-icon>
+    </button>
+    <button 
+      mat-icon-button 
+      class="theme-toggle" 
+      (click)="toggleTheme()"
+      [matTooltip]="themeService.isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'"
+      aria-label="Toggle dark mode">
+      <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading job postings...</p>
+  </div>
+
+  <!-- Filters section -->
+  <div *ngIf="!isLoading" class="filters-container">
+    <div class="filters-header">
+      <h2>Filters</h2>
+      <button 
+        mat-button 
+        (click)="clearFilters()"
+        [disabled]="!hasActiveFilters()"
+        class="clear-filters-header"
+        [matTooltip]="hasActiveFilters() ? 'Clear all filters' : 'No active filters'">
+        <mat-icon>clear</mat-icon>
+        Clear All
+      </button>
+    </div>
+    <div class="filters-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Company Name</mat-label>
+        <input matInput [(ngModel)]="companyFilter" (ngModelChange)="applyFilters()" placeholder="Search companies...">
+        <mat-icon matPrefix>business</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Job Title</mat-label>
+        <input matInput [(ngModel)]="jobTitleFilter" (ngModelChange)="applyFilters()" placeholder="e.g. Senior Engineer">
+        <mat-icon matPrefix>work</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Location</mat-label>
+        <input matInput [(ngModel)]="locationFilter" (ngModelChange)="applyFilters()" placeholder="e.g. San Francisco">
+        <mat-icon matPrefix>location_on</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Remote Policy</mat-label>
+        <mat-select [(ngModel)]="remotePolicyFilter" (ngModelChange)="applyFilters()">
+          <mat-option [value]="''">All</mat-option>
+          <mat-option *ngFor="let policy of remotePolicyOptions.slice(1)" [value]="policy">
+            {{ policy }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>home_work</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" 
+                      class="tech-stack-field"
+                      [ngClass]="{'tech-stack-error': !techStackFilterIsValid}">
+        <mat-label>Tech Stack</mat-label>
+        <input matInput 
+               [(ngModel)]="techStackFilter" 
+               (ngModelChange)="applyFilters()" 
+               placeholder='e.g. Python AND Django OR "Machine Learning"'
+               [matTooltip]="techStackFilterIsValid ? 'Supports: AND, OR, NOT, parentheses (). Use quotes for multi-word terms.\nExamples:\n• Python AND Django\n• (Python OR Ruby) AND React\n• NOT Java\n• &quot;Machine Learning&quot; AND Python' : techStackErrorMessage"
+               matTooltipClass="tech-stack-tooltip">
+        <mat-icon matPrefix>code</mat-icon>
+        <button mat-icon-button 
+                matSuffix 
+                (click)="showTechStackHelp($event)"
+                matTooltip="Show advanced filter syntax help"
+                type="button">
+          <mat-icon>help_outline</mat-icon>
+        </button>
+        <mat-error *ngIf="!techStackFilterIsValid">{{ techStackErrorMessage }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Visa Sponsorship</mat-label>
+        <mat-select [(ngModel)]="visaSponsorshipFilter" (ngModelChange)="applyFilters()">
+          <mat-option [value]="''">All</mat-option>
+          <mat-option *ngFor="let option of visaSponsorshipOptions.slice(1)" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matPrefix>card_travel</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Results count -->
+  <div *ngIf="!isLoading" class="results-info">
+    <p>Showing {{ dataSource.filteredData.length }} of {{ dataSource.data.length }} jobs</p>
+    <button 
+      mat-button 
+      class="compare-cta"
+      (click)="openComparison()"
+      [disabled]="!comparison.canCompare()"
+      [matTooltip]="comparison.canCompare() ? '' : 'Select at least 2 jobs to compare'">
+      <mat-icon>compare_arrows</mat-icon>
+      @if (comparison.count() === 0) {
+        Select at least 2 jobs to compare
+      } @else if (comparison.count() === 1) {
+        Select at least one more job to compare
+      } @else {
+        Compare {{ comparison.count() }} jobs
+      }
+    </button>
+  </div>
+
+  <!-- Jobs table -->
+  <div *ngIf="!isLoading" class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort class="jobs-table">
+      
+      <!-- Compare Column -->
+      <ng-container matColumnDef="compare">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let job" class="compare-cell" (click)="$event.stopPropagation()">
+          <button 
+            mat-icon-button 
+            (click)="toggleCompare(job, $event)"
+            [matTooltip]="comparison.isInComparison(job.id) ? 'Remove from Compare' : 'Add to Compare'"
+            [color]="comparison.isInComparison(job.id) ? 'warn' : 'primary'"
+            aria-label="Add to compare">
+            <mat-icon>{{ comparison.isInComparison(job.id) ? 'remove_circle' : 'add_circle' }}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Company Name Column -->
+      <ng-container matColumnDef="company_name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Company</th>
+        <td mat-cell *matCellDef="let job" class="company-cell">
+          <div class="company-cell-content">
+            <app-company-logo 
+              [companyName]="job.company_name"
+              [companyWebsite]="job.company_website"
+              [applyLinks]="job.apply_links"
+              size="small">
+            </app-company-logo>
+            <strong>{{ job.company_name }}</strong>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Job Titles Column -->
+      <ng-container matColumnDef="job_titles">
+        <th mat-header-cell *matHeaderCellDef>Job Titles</th>
+        <td mat-cell *matCellDef="let job" class="titles-cell">
+          <mat-chip-set>
+            <mat-chip *ngFor="let title of job.job_titles.slice(0, 2)">
+              {{ title }}
+            </mat-chip>
+            <mat-chip *ngIf="job.job_titles.length > 2" class="more-chip">
+              +{{ job.job_titles.length - 2 }} more
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
+
+      <!-- Locations Column -->
+      <ng-container matColumnDef="locations">
+        <th mat-header-cell *matHeaderCellDef>Locations</th>
+        <td mat-cell *matCellDef="let job" class="locations-cell">
+          <span *ngFor="let loc of job.locations.slice(0, 2); let last = last">
+            {{ loc }}<span *ngIf="!last">, </span>
+          </span>
+          <span *ngIf="job.locations.length > 2" class="more-text">
+            +{{ job.locations.length - 2 }} more
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Remote Policy Column -->
+      <ng-container matColumnDef="remote_policy">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Remote</th>
+        <td mat-cell *matCellDef="let job">
+          <span class="remote-badge" [ngClass]="job.remote_policy ? 'remote-' + job.remote_policy.toLowerCase() : 'remote-unknown'">
+            {{ job.remote_policy || 'Not specified' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Tech Stack Column -->
+      <ng-container matColumnDef="tech_stack">
+        <th mat-header-cell *matHeaderCellDef>Tech Stack</th>
+        <td mat-cell *matCellDef="let job" class="tech-cell">
+          <mat-chip-set>
+            <mat-chip *ngFor="let tech of job.tech_stack.slice(0, 3)" class="tech-chip">
+              {{ tech }}
+            </mat-chip>
+            <mat-chip *ngIf="job.tech_stack.length > 3" class="more-chip">
+              +{{ job.tech_stack.length - 3 }}
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
+
+      <!-- Timestamp Column -->
+      <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Posted</th>
+        <td mat-cell *matCellDef="let job">
+          {{ job.timestamp || 'N/A' }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr 
+        mat-row 
+        *matRowDef="let row; columns: displayedColumns;" 
+        class="job-row"
+        (click)="openJobDetail(row)">
+      </tr>
+    </table>
+
+    <div class="paginator-row">
+      <button 
+        mat-button 
+        class="compare-cta paginator-compare"
+        (click)="openComparison()"
+        [disabled]="!comparison.canCompare()"
+        [matTooltip]="comparison.canCompare() ? '' : 'Select at least 2 jobs to compare'">
+        <mat-icon>compare_arrows</mat-icon>
+        @if (comparison.count() === 0) {
+          Select at least 2 jobs to compare
+        } @else if (comparison.count() === 1) {
+          Select at least one more job to compare
+        } @else {
+          Compare {{ comparison.count() }} jobs
+        }
+      </button>
+      <mat-paginator 
+        [pageSize]="5"
+        [pageSizeOptions]="pageSizeOptions" 
+        showFirstLastButtons
+        (page)="onPageChange()">
+      </mat-paginator>
+    </div>
+  </div>
+</div>

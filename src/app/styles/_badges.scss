@@ -1,0 +1,63 @@
+// Shared badge styles to reduce duplication across components
+
+@mixin badge-base {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+@mixin remote-badge-variants {
+  &.remote-remote {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+  }
+
+  &.remote-hybrid {
+    background-color: var(--color-warning-light);
+    color: var(--color-warning);
+  }
+
+  &.remote-onsite {
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+  }
+
+  &.remote-global {
+    background-color: var(--color-info-light);
+    color: var(--color-info);
+  }
+
+  &.remote-unknown {
+    background-color: var(--chip-neutral-bg);
+    color: var(--chip-neutral-text);
+  }
+}
+
+@mixin visa-badge-variants {
+  &.visa-yes {
+    background-color: var(--color-success-light);
+    color: var(--color-success);
+  }
+
+  &.visa-no {
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+  }
+
+  &.visa-unknown {
+    background-color: var(--chip-neutral-bg);
+    color: var(--chip-neutral-text);
+  }
+}
+
+.remote-badge {
+  @include badge-base;
+  @include remote-badge-variants;
+}
+
+.visa-badge {
+  @include badge-base;
+  @include visa-badge-variants;
+}

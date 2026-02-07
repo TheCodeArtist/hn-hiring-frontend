@@ -1,0 +1,195 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="dialog-header-title">
+      <app-company-logo 
+        [companyName]="job.company_name"
+        [companyWebsite]="job.company_website"
+        [applyLinks]="job.apply_links"
+        size="large">
+      </app-company-logo>
+      <h2 mat-dialog-title>{{ job.company_name }}</h2>
+    </div>
+    <div class="dialog-header-actions">
+      <button 
+        mat-icon-button 
+        (click)="toggleCompare()"
+        [matTooltip]="isInComparison() ? 'Remove from Compare' : 'Add to Compare'"
+        [color]="isInComparison() ? 'warn' : 'primary'"
+        aria-label="Add to compare">
+        <mat-icon>{{ isInComparison() ? 'remove_circle' : 'add_circle' }}</mat-icon>
+      </button>
+      <button mat-icon-button (click)="closeDialog()" class="close-button" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <!-- Job Titles -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>work</mat-icon>
+        <mat-card-title>Positions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-chip-set>
+          <mat-chip *ngFor="let title of job.job_titles" class="title-chip">
+            {{ title }}
+          </mat-chip>
+        </mat-chip-set>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Summary -->
+    <mat-card class="info-card" *ngIf="job.summary">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>description</mat-icon>
+        <mat-card-title>About the Company</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="summary-text">{{ job.summary }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Job Details -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>info</mat-icon>
+        <mat-card-title>Job Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <mat-icon>location_on</mat-icon>
+            <div>
+              <strong>Location</strong>
+              <p>{{ job.locations.join(', ') || 'Not specified' }}</p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon>home_work</mat-icon>
+            <div>
+              <strong>Remote Policy</strong>
+              <p>
+                <span class="remote-badge" [ngClass]="job.remote_policy ? 'remote-' + job.remote_policy.toLowerCase() : 'remote-unknown'">
+                  {{ job.remote_policy || 'Not specified' }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon>schedule</mat-icon>
+            <div>
+              <strong>Job Type</strong>
+              <p>{{ job.job_type || 'Not specified' }}</p>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="job.compensation">
+            <mat-icon>attach_money</mat-icon>
+            <div>
+              <strong>Compensation</strong>
+              <p>{{ job.compensation }}</p>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="job.experience_level && job.experience_level.length > 0">
+            <mat-icon>trending_up</mat-icon>
+            <div>
+              <strong>Experience Level</strong>
+              <p>{{ job.experience_level.join(', ') }}</p>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon>card_travel</mat-icon>
+            <div>
+              <strong>Visa Sponsorship</strong>
+              <p>
+                <span *ngIf="job.visa_sponsorship === true" class="visa-badge visa-yes">Yes</span>
+                <span *ngIf="job.visa_sponsorship === false" class="visa-badge visa-no">No</span>
+                <span *ngIf="job.visa_sponsorship !== true && job.visa_sponsorship !== false" class="visa-badge visa-unknown">
+                  {{ job.visa_sponsorship || 'Not specified' }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tech Stack -->
+    <mat-card class="info-card" *ngIf="job.tech_stack && job.tech_stack.length > 0">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>code</mat-icon>
+        <mat-card-title>Tech Stack</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-chip-set>
+          <mat-chip *ngFor="let tech of job.tech_stack" class="tech-chip">
+            {{ tech }}
+          </mat-chip>
+        </mat-chip-set>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Contact Information -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>contact_mail</mat-icon>
+        <mat-card-title>How to Apply</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="contact-section">
+          <div *ngIf="job.contact_email" class="contact-item">
+            <strong>Contact Email:</strong>
+            <a [href]="'mailto:' + job.contact_email" class="contact-link">
+              {{ job.contact_email }}
+            </a>
+          </div>
+
+          <div *ngIf="job.apply_links && job.apply_links.length > 0" class="contact-item">
+            <strong>Application Links:</strong>
+            <div class="links-list">
+              <a *ngFor="let link of job.apply_links" 
+                 [href]="link.startsWith('http') ? link : 'https://' + link" 
+                 target="_blank" 
+                 class="apply-link">
+                <mat-icon>open_in_new</mat-icon>
+                {{ link }}
+              </a>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <strong>Original HN Post:</strong>
+            <a [href]="getHnLink()" target="_blank" class="hn-link">
+              <mat-icon>open_in_new</mat-icon>
+              View on Hacker News
+            </a>
+          </div>
+
+          <div class="contact-item meta-info">
+            <p><strong>Posted by:</strong> {{ job.username }}</p>
+            <p *ngIf="job.timestamp"><strong>Posted on:</strong> {{ job.timestamp }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="closeDialog()">Close</button>
+    <button mat-raised-button color="primary" [disabled]="!job.apply_links || job.apply_links.length === 0">
+      <a *ngIf="job.apply_links && job.apply_links.length > 0" 
+         [href]="job.apply_links[0].startsWith('http') ? job.apply_links[0] : 'https://' + job.apply_links[0]" 
+         target="_blank"
+         class="apply-button-link">
+        Apply Now
+      </a>
+      <span *ngIf="!job.apply_links || job.apply_links.length === 0">No Apply Link</span>
+    </button>
+  </mat-dialog-actions>
+</div>

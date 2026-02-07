@@ -1,0 +1,253 @@
+<div class="comparison-view">
+  <header class="comparison-header">
+    <button mat-button (click)="backToJobs()" matTooltip="Back to job list" aria-label="Back to searching/filtering jobs" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+      Back to searching/filtering Jobs
+    </button>
+    <h1>Compare jobs</h1>
+    @if (comparison.jobs().length >= 2) {
+      <mat-form-field appearance="outline" class="highlight-dropdown">
+        <mat-label>Highlight</mat-label>
+        <mat-select 
+          [value]="highlightMode()"
+          (selectionChange)="onHighlightModeChange($event.value)"
+          aria-label="Highlight mode">
+          <mat-option value="none">None</mat-option>
+          <mat-option value="differences">Differences</mat-option>
+          <mat-option value="commons">Commons</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+    <div class="spacer"></div>
+    @if (!isMobile() && comparison.jobs().length > 0) {
+      <div class="column-counter">
+        @if (scrollInfo().hasOverflow) {
+          <span class="counter-text">
+            Viewing {{ scrollInfo().visibleRange }} of {{ comparison.jobs().length }} jobs
+          </span>
+        } @else {
+          <span class="counter-text">
+            {{ comparison.jobs().length }} job{{ comparison.jobs().length === 1 ? '' : 's' }}
+          </span>
+        }
+      </div>
+    }
+    <button
+      mat-button
+      (click)="removeAll()"
+      color="warn"
+      class="remove-all"
+      [matTooltip]="'Remove all jobs from comparison'"
+      aria-label="Remove all">
+      <mat-icon>delete_sweep</mat-icon>
+      Remove All
+    </button>
+  </header>
+
+  @if (comparison.jobs().length === 0) {
+    <div class="comparison-placeholder">
+      <p>No jobs to compare. Add at least 2 jobs from the job list.</p>
+    </div>
+  } @else {
+    <div class="comparison-body">
+      @if (isMobile()) {
+        <div class="mobile-arrows">
+          <button
+            mat-icon-button
+            (click)="mobilePrev()"
+            [disabled]="!showLeftArrow()"
+            matTooltip="Previous jobs"
+            aria-label="Previous jobs">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="mobileNext()"
+            [disabled]="!showRightArrow()"
+            matTooltip="Next jobs"
+            aria-label="Next jobs">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+      <div 
+        class="comparison-scroll-container"
+        [class.can-scroll-left]="scrollInfo().canScrollLeft"
+        [class.can-scroll-right]="scrollInfo().canScrollRight">
+        <!-- Scroll indicators for desktop -->
+        @if (!isMobile()) {
+          <button 
+            class="scroll-indicator left"
+            [class.visible]="scrollInfo().canScrollLeft"
+            [disabled]="!scrollInfo().canScrollLeft"
+            (click)="scrollLeft()"
+            matTooltip="Scroll left"
+            aria-label="Scroll left">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button 
+            class="scroll-indicator right"
+            [class.visible]="scrollInfo().canScrollRight"
+            [disabled]="!scrollInfo().canScrollRight"
+            (click)="scrollRight()"
+            matTooltip="Scroll right"
+            aria-label="Scroll right">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        }
+        <div 
+          class="comparison-scroll-wrapper"
+          #scrollContainer
+          (scroll)="onScroll($event)">
+        <div 
+          class="comparison-table-wrapper"
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          [cdkDropListData]="displayedJobs()"
+          (cdkDropListDropped)="onColumnDrop($event)">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th class="label-header-cell">&nbsp;</th>
+                @for (job of displayedJobs(); track job.id) {
+                  <th class="job-header-cell" cdkDrag [cdkDragData]="job">
+                    <div class="job-column-header">
+                      <span class="drag-handle" cdkDragHandle matTooltip="Drag to reorder" aria-label="Drag to reorder">
+                        <mat-icon>drag_indicator</mat-icon>
+                      </span>
+                      <div class="company-header-content">
+                        <app-company-logo 
+                          [companyName]="job.company_name"
+                          [companyWebsite]="job.company_website"
+                          [applyLinks]="job.apply_links"
+                          size="medium">
+                        </app-company-logo>
+                        <span class="company-name">{{ job.company_name ?? 'Unknown' }}</span>
+                      </div>
+                      <div class="header-actions">
+                        <button
+                          mat-icon-button
+                          (click)="openJobDetail(job)"
+                          matTooltip="View full details"
+                          aria-label="View job details">
+                          <mat-icon>info</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="removeJob(job)"
+                          class="close-col"
+                          matTooltip="Remove from comparison"
+                          aria-label="Remove from comparison">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </th>
+                }
+                @if (comparison.jobs().length === 1) {
+                  <th class="job-header-cell add-job-placeholder-cell">
+                    <div class="add-job-placeholder-header">
+                      <button 
+                        mat-stroked-button 
+                        color="primary" 
+                        (click)="backToJobs()"
+                        class="add-job-button">
+                        <mat-icon>add</mat-icon>
+                        Add job to compare
+                      </button>
+                    </div>
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (section of sections; track section.title) {
+                <!-- Section header row -->
+                <tr class="section-header-row">
+                  <td class="section-label-cell">
+                    <mat-icon class="section-icon">{{ section.icon }}</mat-icon>
+                    <span>{{ section.title }}</span>
+                  </td>
+                  @for (job of displayedJobs(); track job.id) {
+                    <td class="section-spacer-cell"></td>
+                  }
+                  @if (comparison.jobs().length === 1) {
+                    <td class="section-spacer-cell add-job-placeholder-spacer"></td>
+                  }
+                </tr>
+
+                <!-- Field rows -->
+                @for (field of section.fields; track field.key) {
+                  @if (field.multi) {
+                    @for (i of range(getMaxLength(field.key)); track i) {
+                      <tr class="field-row">
+                        <td class="field-label-cell">
+                          {{ i === 0 ? field.label : '' }}
+                        </td>
+                        @let commonSet = getCommonValues(field.key);
+                        @let differentSet = getDifferentValues(field.key);
+                        @for (job of displayedJobs(); track job.id) {
+                          <td class="field-value-cell">
+                            @if (field.key === 'apply_links') {
+                              @let linkValue = getValueAt(job, field.key, i);
+                              @if (linkValue) {
+                                <a 
+                                  [href]="linkValue" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  class="cell-value"
+                                  [class.common-value]="highlightMode() === 'commons' && commonSet.has(linkValue)"
+                                  [class.different-value]="highlightMode() === 'differences' && differentSet.has(linkValue)">
+                                  {{ linkValue }}
+                                </a>
+                              }
+                            } @else {
+                              @let cellValue = getValueAt(job, field.key, i);
+                              <span
+                                class="cell-value"
+                                [class.common-value]="highlightMode() === 'commons' && commonSet.has(cellValue)"
+                                [class.different-value]="highlightMode() === 'differences' && differentSet.has(cellValue)">
+                                {{ cellValue }}
+                              </span>
+                            }
+                          </td>
+                        }
+                        @if (comparison.jobs().length === 1) {
+                          <td class="field-value-cell add-job-placeholder-cell"></td>
+                        }
+                      </tr>
+                    }
+                  } @else {
+                    <tr class="field-row">
+                      <td class="field-label-cell">{{ field.label }}</td>
+                      @for (job of displayedJobs(); track job.id) {
+                        <td class="field-value-cell">
+                          <span
+                            class="cell-value"
+                            [class.common-value]="highlightMode() === 'commons' && isCommonSingle(field.key, job)"
+                            [class.different-value]="highlightMode() === 'differences' && isDifferentSingle(field.key, job)">
+                            @if (field.key === 'hn_link') {
+                              <a [href]="getSingleValue(job, field.key)" target="_blank" rel="noopener">
+                                View on Hacker News
+                              </a>
+                            } @else {
+                              {{ getSingleValue(job, field.key) }}
+                            }
+                          </span>
+                        </td>
+                      }
+                      @if (comparison.jobs().length === 1) {
+                        <td class="field-value-cell add-job-placeholder-cell"></td>
+                      }
+                    </tr>
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

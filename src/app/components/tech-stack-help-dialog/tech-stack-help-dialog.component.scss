@@ -1,0 +1,253 @@
+.help-dialog {
+  max-width: 800px;
+}
+
+.help-dialog h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 20px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+
+  mat-icon {
+    color: var(--color-primary);
+  }
+}
+
+.help-dialog mat-dialog-content {
+  padding: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.help-dialog mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.tab-content {
+  padding: 24px;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+  }
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: var(--color-primary);
+    font-size: 1rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+}
+
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.example-item,
+.complex-example {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.example-query {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  code {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--color-primary);
+  }
+
+  button {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.complex-example .example-query {
+  margin-top: 8px;
+}
+
+.example-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.operator-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.precedence-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+
+  th,
+  td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  td {
+    color: var(--text-secondary);
+
+    strong {
+      color: var(--text-primary);
+    }
+
+    code {
+      padding: 2px 6px;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--color-primary);
+    }
+  }
+
+  tbody tr:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    color: var(--text-secondary);
+
+    mat-icon {
+      color: var(--color-success);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    span {
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    code {
+      padding: 2px 6px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--color-primary);
+    }
+  }
+}
+
+.info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-info-light);
+  border: 1px solid var(--color-info);
+  border-radius: 8px;
+  margin-top: 20px;
+
+  mat-icon {
+    color: var(--color-info);
+    flex-shrink: 0;
+  }
+
+  div {
+    flex: 1;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  &.warning {
+    background: var(--color-warning-light);
+    border-color: var(--color-warning);
+
+    mat-icon {
+      color: var(--color-warning);
+    }
+
+    ul {
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+
+      li {
+        margin-bottom: 4px;
+      }
+    }
+
+    code {
+      padding: 2px 6px;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+  }
+}
+
+// Dark mode adjustments
+[data-theme='dark'] {
+  .precedence-table tbody tr:hover {
+    background: var(--bg-tertiary);
+  }
+}
