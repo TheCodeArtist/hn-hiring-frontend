@@ -9,7 +9,7 @@ import { tap, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class JobService {
-  private apiUrl = '/hn-hiring-scanner/jobs.json';  // Static file for GitHub Pages
+  private apiUrl = 'jobs.json';  // Static file served from public folder
   private jobsSubject = new BehaviorSubject<Job[]>([]);
   public jobs$ = this.jobsSubject.asObservable();
   /** Signal of current jobs for reactive consumption (e.g. comparison). */
