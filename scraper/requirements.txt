@@ -1,0 +1,4 @@
+# Requirements for HN Job Scraper Scripts
+
+# For hn-api-scraper.py (API-based scraper)
+aiohttp>=3.8.0

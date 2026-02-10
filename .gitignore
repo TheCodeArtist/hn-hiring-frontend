@@ -2,3 +2,5 @@ node_modules/
 front-end/dist/
 .vscode
 .angular
+
+.python-version
