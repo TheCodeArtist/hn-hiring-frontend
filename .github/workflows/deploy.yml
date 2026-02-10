@@ -26,20 +26,23 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: 'front-end/package-lock.json'
       
       - name: Install dependencies
         run: npm ci
+        working-directory: front-end
       
       - name: Build Angular application
         run: npm run build
+        working-directory: front-end
       
       - name: Copy index.html to 404.html for SPA routing
-        run: cp dist/hn-hiring-frontend/browser/index.html dist/hn-hiring-frontend/browser/404.html
+        run: cp front-end/dist/hn-hiring-frontend/browser/index.html front-end/dist/hn-hiring-frontend/browser/404.html
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/hn-hiring-frontend/browser
+          path: front-end/dist/hn-hiring-frontend/browser
 
   deploy:
     environment:
